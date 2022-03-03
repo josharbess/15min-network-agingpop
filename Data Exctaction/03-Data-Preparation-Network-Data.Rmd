@@ -2,13 +2,6 @@
 title: "03-Data-Preparation-Network-Data"
 ---
 
-In this notebook I pre-process the network data.
-
-I downloaded the following data from GTHA's Transportation Tomorrow Survey:
-
-- A shape file with the 2006 GTA zoning system
-
-Further, the notebook downloads Open Street Maps information about the network.
 
 ## Preliminaries
 
@@ -24,33 +17,27 @@ library(tidyverse)
 library(units)
 ```
 
-## Traffic Analysis Zones
+## Neighbourhood Shapes
 
 Read the boundaries of the traffic analysis zones:
 ```{r}
-hamilton_taz <- st_read("Hamilton-CMA-tts06.shp")
+hamilton_neighbourhoods <- st_read("Neighbourhood_Boundaries.shp")
 ```
 
 Project object:
 ```{r}
-hamilton_taz <- hamilton_taz %>%
+hamilton_neighbourhoods <- hamilton_neighbourhoods %>%
   st_transform(crs = 32617)
 ```
 
-Prepare traffic analysis zones:
-```{r}
-hamilton_taz <- hamilton_taz %>%
-  transmute(ID,
-            AREA = st_area(geometry) %>% set_units(km^2) %>% drop_units(),
-            GTA06 = as.character(GTA06))
-```
+
 
 ## OSM - road network
 
 Obtain a bounding box for Hamilton:
 ```{r}
 #gtha_bb <- st_bbox(taz_boundaries)
-hamilton_bb <- hamilton_taz %>%
+hamilton_bb <- hamilton_neighbourhoods %>%
   st_transform(4326) %>%
   st_bbox()
 ```
