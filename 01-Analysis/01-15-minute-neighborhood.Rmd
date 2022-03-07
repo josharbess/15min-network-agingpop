@@ -12,16 +12,19 @@ if (!require("vaccHamilton", character.only = TRUE)) {
 ```
 
 ```{r message = FALSE}
-library(envsocty3LT3) # Course package
+library(envsocty3LT3) # Course package with network data
 library(sf) # Package to work with geospatial information in simple features format
 library(tidyverse) # Family of packages for data manipulation, analysis, and visualization
 library(tidygraph)
+library(vaccHamilton) # Data about land use types in Hamilton
 ```
 
 ```{r}
 data("hamilton_graph")
+data("hamilton_neighborhoods")
 data("hamilton_sustenance")
 data("hamilton_taz")
+data("urban_types")
 ```
 
 
