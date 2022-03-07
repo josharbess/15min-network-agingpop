@@ -41,6 +41,9 @@ hamilton_bb <- hamilton_neighbourhoods %>%
   st_transform(4326) %>%
   st_bbox()
 ```
+<!---
+Will need to select neighbourhoods first and then define a smaller bounding box, as the entire city will be far too big.
+---!>
 
 <!---
 Use the bounding box to retrieve OSM _highway_ data for Hamilton:
@@ -58,6 +61,27 @@ save(hamilton_osm,
      file ="hamilton_osm.RData")
 ```
 --->
+
+Retreive destination data:
+```{r}
+destination_osm <- osmdata::opq(bbox =  hamilton_bb, 
+                             timeout = 120) %>% 
+  osmdata::add_osm_feature(key = 'highway') %>%
+  
+  osmdata::osmdata_sf() %>% 
+  osmdata::osm_poly2line()
+
+
+```
+
+
+Save file:
+```{r eval = FALSE}
+save(destination_osm, 
+     file ="destination_osm.RData")
+```
+
+
 
 Load the clean file:
 ```{r}
