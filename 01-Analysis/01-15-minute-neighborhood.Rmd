@@ -1,0 +1,84 @@
+---
+title: "01-15-minute-neighborhood"
+output: html_notebook
+---
+
+```{r install-data-package, include = FALSE}
+# Run only once if needed to install data package `vaccHamilton`
+if (!require("vaccHamilton", character.only = TRUE)) {
+      devtools::install_github("https://github.com/paezha/Accessibility-Pharmacies-Hamilton-Vaccines", 
+                               subdir = "vaccHamilton")
+  }
+```
+
+```{r message = FALSE}
+library(envsocty3LT3) # Course package
+library(sf) # Package to work with geospatial information in simple features format
+library(tidyverse) # Family of packages for data manipulation, analysis, and visualization
+library(tidygraph)
+```
+
+```{r}
+data("hamilton_graph")
+data("hamilton_sustenance")
+data("hamilton_taz")
+```
+
+
+Filter _out_ the highways in the network to keep only city and local streets:
+```{r}
+hamilton_graph_local <- hamilton_graph %>%
+  filter(highway != "motorway" | highway != "motorway_link")
+```
+
+
+Plot roads:
+```{r}
+ggplot() +
+  geom_sf(data = hamilton_taz) + 
+  geom_sf(data = hamilton_graph_local %>%
+            activate(nodes) %>%
+            filter(!is.na(GTA06)) %>%
+            as_tibble() %>%
+            st_as_sf(),
+            color = "red")
+```
+
+
+Plot centroids:
+```{r}
+ggplot() +
+  geom_sf(data = hamilton_taz) + 
+  geom_sf(data = hamilton_graph_local %>%
+            activate(nodes) %>%
+            filter(!is.na(GTA06)) %>%
+            as_tibble() %>%
+            st_as_sf(),
+            color = "red")
+```
+
+
+Choose a point at random in each taz:
+```{r}
+pts <- st_sample(hamilton_taz, 
+                 size = rep(5, 
+                            nrow(hamilton_taz)))
+```
+
+
+```{r}
+ggplot() +
+  geom_sf(data = hamilton_taz) + 
+  geom_sf(data = pts)
+```
+
+
+Add travel time to the network, assuming a walking speed of walking speed of 5.0 km/h = 84 m/min):
+```{r}
+hamilton_graph_local <- hamilton_graph_local %>% # Pass the object `hamilton_graph_local` to the following function
+    activate(edges) %>% # Activate the edges of the `tbl_graph` object
+    mutate(length = st_length(geometry),  # Use function `st_length()` and the geometry of the edges to calculate the length of the link, and use `mutate()` to create a new column in the table to store this information
+           time = length/set_units(84, "m/min"))
+```
+
+
